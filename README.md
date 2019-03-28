@@ -10,4 +10,4 @@ I made this project to test out an interesting type of dithering. The algorithm 
 
 1. Clone this repository
 1. Open the `index.html` in your favorite browser
-2. Upload a file to the dialog box
+2. Upload a png or jpeg to the dialog box
