@@ -8,5 +8,6 @@ I made this project to test out an interesting type of dithering. The algorithm 
 
 **OR**
 
-1. Open index.html in your favorite browser
+1. Clone this repository
+1. Open the `index.html` in your favorite browser
 2. Upload a file to the dialog box
