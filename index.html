@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Probabilistic Dithering</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <div>
+        <input type="file" id="imageInput" accept="image/png, image/jpeg">
+    </div>
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        imageInput.addEventListener('change', handleImage, false);
+
+        const originalCanvas = document.createElement('canvas');
+        const originalContext = originalCanvas.getContext('2d');
+        document.body.appendChild(originalCanvas);
+
+        const ditheredCanvas = document.createElement('canvas');
+        const ditheredContext = ditheredCanvas.getContext('2d');
+        document.body.appendChild(ditheredCanvas);
+
+        let imageLoaded = false;
+
+        function handleImage(e) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalCanvas.width = ditheredCanvas.width = img.width;
+                    originalCanvas.height = ditheredCanvas.height = img.height;
+                    originalContext.drawImage(img, 0, 0);
+                    ditheredContext.drawImage(img, 0, 0);
+                    imageLoaded = true;
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+
+        const scanRate = 100;
+
+        const rgbaToGrayScale = (r, g, b, a) => (Math.max(r, g, b) + Math.min(r, g, b)) / 2 * a / 255;
+        const ditherImage = () => {
+            if (imageLoaded) {
+                const image = originalContext.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
+                const imageData = image.data;
+                for (let i = 0; i < imageData.length; i += 4) {
+                    const grayValue = rgbaToGrayScale(imageData[i], imageData[i + 1], imageData[i + 2], imageData[i + 3]);
+                    let newR = 0;
+                    let newG = 0;
+                    let newB = 0;
+                    let newA = 255;
+                    if (grayValue > 0 && grayValue > Math.random() * 255) {
+                        newR = newG = newB = 255;
+                    }
+                    imageData[i] = newR;
+                    imageData[i + 1] = newG;
+                    imageData[i + 2] = newB;
+                    imageData[i + 3] = newA;
+                }
+                ditheredContext.putImageData(image, 0, 0);
+            }
+            window.setTimeout(ditherImage, scanRate);
+        };
+
+        window.setTimeout(ditherImage, scanRate);
+    </script>
+</body>
+
+</html>
